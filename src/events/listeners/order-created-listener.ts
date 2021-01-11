@@ -6,6 +6,8 @@ import {
 } from '@sirmctickets/commontickets';
 import { queueGroupName } from './queueGroupName';
 import { Ticket } from '../../models/ticket';
+import { TicketUpdatedPublisher } from '../publishers/ticket-updated-publisher';
+import { natsWrapper } from '../../nats-wrapper';
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
 	readonly subject = Subjects.OrderCreated;
@@ -25,6 +27,7 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
 
 		// Save the ticket
 		await ticket.save();
+		new TicketUpdatedPublisher();
 
 		// ack the message
 		msg.ack();
