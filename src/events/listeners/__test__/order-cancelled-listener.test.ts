@@ -32,3 +32,16 @@ const setup = async () => {
 
 	return { listener, ticket, data, msg, orderId };
 };
+
+// Please split this in three tests! it is been made this way for save time
+it('updates the ticket, publishes an event, and acks the message', async () => {
+	const { msg, data, ticket, orderId, listener } = await setup();
+
+	await listener.onMessage(data, msg);
+
+	const updatedTicket = await Ticket.findById(ticket.id);
+
+	expect(updatedTicket!.orderId).not.toBeDefined();
+	expect(msg.ack).toHaveBeenCalled();
+	expect(natsWrapper.client.publish).toHaveBeenCalled();
+});
