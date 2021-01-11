@@ -35,4 +35,6 @@ const setup = async () => {
 	const msg: Message = {
 		ack: jest.fn(),
 	};
+
+	return { listener, ticket, data, msg };
 };
