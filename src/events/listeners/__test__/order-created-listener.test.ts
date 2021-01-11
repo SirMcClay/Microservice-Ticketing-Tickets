@@ -1,5 +1,5 @@
 import { Message } from 'node-nats-streaming';
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 import { OrderCreatedEvent, OrderStatus } from '@sirmctickets/commontickets';
 import { OrderCreatedListener } from '../order-created-listener';
 import { natsWrapper } from '../../../nats-wrapper';
@@ -38,3 +38,21 @@ const setup = async () => {
 
 	return { listener, ticket, data, msg };
 };
+
+it('sets the orderId of the ticket', async () => {
+	const { listener, ticket, data, msg } = await setup();
+
+	await listener.onMessage(data, msg);
+
+	const updatedTicket = await Ticket.findById(ticket.id);
+
+	expect(updatedTicket!.orderId).toEqual(data.id);
+});
+
+it('acks the message', async () => {
+	const { listener, ticket, data, msg } = await setup();
+
+	await listener.onMessage(data, msg);
+
+	expect(msg.ack).toHaveBeenCalled();
+});
